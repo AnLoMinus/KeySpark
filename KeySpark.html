@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🎹 KeySpark — Web Organ (GlowTune UI) · v0.1.1</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #131a33;
+      --ink: #eaf2ff;
+      --muted: #98a6c7;
+      --accent: #46e6ff;
+      --gold: #ffd166;
+      --ok: #54e1a6;
+      --warn: #ffb703;
+      --err: #ff5c7a;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, Segoe UI, Arial;
+      color: var(--ink);
+      background: radial-gradient(1200px 600px at 70% -20%, #1a2552 0%, #0b1020 55%) fixed #0b1020
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: auto;
+      padding: 18px
+    }
+
+    header {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px
+    }
+
+    h1 {
+      font-size: clamp(20px, 4vw, 34px);
+      margin: 0;
+      letter-spacing: .5px
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    .brand {
+      font-weight: 900;
+      letter-spacing: .3px
+    }
+
+    .brand .spark {
+      background: linear-gradient(90deg, #46e6ff, #ffd166);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 22px rgba(70, 230, 255, .35)
+    }
+
+    .badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .badge {
+      background: linear-gradient(180deg, #1f2a56, #141b35);
+      border: 1px solid #263068;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: #cfe3ff
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 16px
+    }
+
+    .card {
+      background: linear-gradient(180deg, #111935, #0d142c);
+      border: 1px solid #1e2958;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .35)
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      margin-bottom: 8px
+    }
+
+    .title .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 16px var(--accent)
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    label {
+      font-size: 12px;
+      color: #c8d6ff
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent)
+    }
+
+    .num {
+      min-width: 52px;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      color: #a6b5df
+    }
+
+    .kbd {
+      display: grid;
+      grid-template-columns: repeat(14, 1fr);
+      gap: 4px;
+      margin-top: 8px
+    }
+
+    .key {
+      position: relative;
+      height: 120px;
+      border-radius: 8px;
+      border: 1px solid #263068;
+      background: linear-gradient(180deg, #12204a, #0f1838);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      color: #a6b5df;
+      font-size: 11px;
+      padding-bottom: 6px;
+      user-select: none
+    }
+
+    .key.black {
+      height: 82px;
+      margin: 0 -12px;
+      z-index: 2;
+      background: linear-gradient(180deg, #0f1220, #0a0d18);
+      border-color: #2a2f55;
+      color: #90a0cf
+    }
+
+    .key.active {
+      outline: 2px solid var(--accent);
+      box-shadow: 0 0 18px rgba(70, 230, 255, .65) inset, 0 0 20px rgba(70, 230, 255, .35)
+    }
+
+    .stack {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    button {
+      background: linear-gradient(180deg, #1e2a56, #131b37);
+      border: 1px solid #2b3a6b;
+      color: #e9f1ff;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer
+    }
+
+    button:hover {
+      filter: brightness(1.05)
+    }
+
+    button:active {
+      transform: translateY(1px)
+    }
+
+    .ok {
+      border-color: #2f7e65
+    }
+
+    .warn {
+      border-color: #8a6b1b
+    }
+
+    .err {
+      border-color: #8a2b44
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: #0f1733;
+      border: 1px solid #273368;
+      color: #cfe3ff;
+      font-size: 12px
+    }
+
+    .small {
+      font-size: 12px;
+      color: #a6b5df
+    }
+
+    .footer {
+      margin-top: 14px;
+      font-size: 12px;
+      color: #98a6c7;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace
+    }
+
+    .drawbar {
+      display: grid;
+      grid-template-columns: 1fr 28px;
+      gap: 8px;
+      align-items: center
+    }
+
+    .led {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #2b2f4a;
+      box-shadow: 0 0 0 0 transparent;
+      display: inline-block
+    }
+
+    .led.on {
+      background: #52ffa8;
+      box-shadow: 0 0 16px #52ffa8
+    }
+
+    .meter {
+      height: 8px;
+      background: #0e1530;
+      border: 1px solid #273368;
+      border-radius: 999px;
+      overflow: hidden
+    }
+
+    .meter>i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #47e6ff, #9df9c7)
+    }
+
+    .cols {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px
+    }
+
+    .hidden {
+      display: none
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1><span class="brand">Key<span class="spark">Spark</span></span> — Web Organ <span
+            class="pill mono">v0.1.1</span> <span class="pill">GlowTune UI</span> <span class="pill mono">ToneLab</span>
+        </h1>
+        <div class="sub">KeySpark Engine · GlowTune UI · ToneLab Repository — מקלדת מחשב + קלט MIDI | יצוא קובץ MIDI |
+          אורגן Drawbars בסגנון Hammond | Leslie Speaker Simulator | ריוורב | אוקטבות | ססטיין</div>
+      </div>
+      <div class="badges">
+        <div class="badge">🎹 KeySpark</div>
+        <div class="badge">✨ GlowTune UI</div>
+        <div class="badge">🧪 ToneLab</div>
+        <div class="badge">🌀 Leslie Sim</div>
+        <div class="badge">🔌 WebMIDI</div>
+        <div class="badge">🔊 WebAudio</div>
+        <div class="badge">💾 Export .mid</div>
+      </div>
+  </div>
+  </header>
+
+  <div class="grid">
+    <!-- SYNTH PANEL -->
+    <section class="card" id="synthPanel">
+      <div class="title"><span class="dot"></span> 🎛️ בקרי צליל – Drawbars, מעטפת ואפקטים</div>
+      <div class="cols">
+        <div>
+          <label>🎚️ Drawbars (יחסי הרמוניות 1–9)</label>
+          <div id="bars"></div>
+        </div>
+        <div>
+          <label>🎹 מעטפת & שליטה</label>
+          <div class="drawbar"><input id="attack" type="range" min="0" max="0.2" step="0.005" value="0.01"><span
+              class="num">Attack</span></div>
+          <div class="drawbar"><input id="release" type="range" min="0" max="1.2" step="0.01" value="0.25"><span
+              class="num">Release</span></div>
+          <div class="drawbar"><input id="vibrato" type="range" min="0" max="7" step="0.1" value="0.7"><span
+              class="num">Vibrato</span></div>
+          <div class="drawbar"><input id="gain" type="range" min="0" max="1" step="0.01" value="0.8"><span
+              class="num">Gain</span></div>
+          <div class="drawbar"><input id="reverbMix" type="range" min="0" max="1" step="0.01" value="0.2"><span
+              class="num">Reverb</span></div>
+          <div style="margin-top:12px">
+            <label>🌀 Leslie Speaker</label>
+            <div class="row" style="margin-top:6px">
+              <button id="leslieToggle" class="warn">🌀 Leslie Off</button>
+              <button id="leslieSpeed" class="pill" disabled>⚡ Fast</button>
+            </div>
+            <div class="drawbar" style="margin-top:6px"><input id="leslieDepth" type="range" min="0" max="1" step="0.01"
+                value="0.6" disabled><span class="num">Depth</span></div>
+          </div>
+        </div>
+        <div>
+          <label>🧰 שליטה כללית</label>
+          <div class="row">
+            <button id="octDown">⬇️ אוקטבה</button>
+            <span class="pill mono" id="oct">Oct 4</span>
+            <button id="octUp">⬆️ אוקטבה</button>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <button id="sustainBtn" class="warn">🎹 Sustain (Space)</button>
+            <span class="pill" id="midiLedWrap">MIDI <i class="led" id="midiLed"></i></span>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <button id="panic" class="err">🛑 Panic (All Notes Off)</button>
+          </div>
+          <div style="margin-top:10px">
+            <div class="small">⌨️ מקשים: שורת ASDF... ללבן | W E T Y U O P לשחורים</div>
+            <div class="small">🎚️ הזז Drawbars ליצירת צבעי צליל קלאסיים (888000000, 808000000 וכד׳)</div>
+          </div>
+        </div>
+      </div>
+      <div class="meter" style="margin-top:10px"><i id="vu"></i></div>
+    </section>
+
+    <!-- RECORDING / EXPORT -->
+    <section class="card">
+      <div class="title"><span class="dot"></span> 💽 הקלטה, ניגון ויצוא MIDI</div>
+      <div class="stack">
+        <button id="rec">⏺️ הקלט</button>
+        <button id="play" disabled>▶️ נגן</button>
+        <button id="stop" disabled>⏹️ עצור</button>
+        <button id="clear" class="warn" disabled>🧹 נקה</button>
+        <button id="export" class="ok" disabled>💾 הורד .mid</button>
+      </div>
+      <div class="small" id="recStatus" style="margin-top:8px">מוכן.</div>
+      <div class="small" style="margin-top:6px">Tempo: <input id="tempo" type="range" min="40" max="200" step="1"
+          value="120"> <span class="pill mono" id="bpm">120 BPM</span></div>
+    </section>
+  </div>
+
+  <!-- KEYBOARD -->
+  <section class="card" style="margin-top:16px">
+    <div class="title"><span class="dot"></span> 🎼 מקלדת ויזואלית</div>
+    <div class="kbd" id="kbd"></div>
+  </section>
+
+  <section class="card" style="margin-top:16px">
+    <div class="title"><span class="dot"></span> 📘 עזרה מהירה</div>
+    <ul class="small">
+      <li>⏩ Shift = בוסט זמני לאוקטבה למעלה | ⏪ Ctrl = אוקטבה למטה לזמן לחיצה</li>
+      <li>⎵ Space = Sustain | 🎛️ המספרים 1–9 משנים במהירות את ה-Drawbars לקונפיגורציות נפוצות</li>
+      <li>🎹 חברו מקלדת MIDI – המכשיר יזוהה אוטומטית (בזמן הראשון לחיצה על מסך כדי לאפשר אודיו)</li>
+    </ul>
+  </section>
+
+  <div class="footer">
+    <div>📅 תאריך לועזי: <b>21.10.2025</b> | 📅 תאריך עברי: <b>י״ט בתשרי תשפ״ו</b></div>
+    <div>© AnLoMinus – SparKing Lab. קרדיטים: Web Audio API, Web MIDI API, ואתוס קוד פתוח. קוד זה פתוח לשימוש חופשי
+      (MIT).</div>
+  </div>
+  </div>
+
+  <script>
+    // ====== Utility: Audio Context & basic nodes ======
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    const audio = new AudioCtx();
+    const master = audio.createGain(); master.gain.value = 0.9; master.connect(audio.destination);
+
+    // Simple reverb using a Schroeder-ish network via convolver with noise-decay IR
+    const convolver = audio.createConvolver();
+    function makeIR(seconds = 2.2, decay = 3) {
+      const rate = audio.sampleRate, len = rate * seconds; const buf = audio.createBuffer(2, len, rate);
+      for (let c = 0; c < 2; c++) {
+        const d = buf.getChannelData(c);
+        for (let i = 0; i < len; i++) { d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay); }
+      }
+      return buf;
+    }
+    convolver.buffer = makeIR(2.5, 3.5);
+    const reverbGain = audio.createGain(); reverbGain.gain.value = 0.2; convolver.connect(reverbGain); reverbGain.connect(master);
+
+    const dryGain = audio.createGain(); dryGain.gain.value = 0.8; dryGain.connect(master);
+
+    // ====== Leslie Simulator (Rotating Speaker Effect) ======
+    // Leslie has two rotors: horn (high freq, fast) and drum (low freq, slow)
+    // We simulate with AM (amplitude modulation) and slight FM (frequency modulation - Doppler)
+
+    const leslie = {
+      enabled: false,
+      speed: 'slow', // 'slow' or 'fast'
+      targetSpeed: 'slow',
+      // Horn rotor (treble) - faster rotation
+      hornLFO_AM: audio.createOscillator(),
+      hornLFO_FM: audio.createOscillator(),
+      hornAMDepth: audio.createGain(),
+      hornFMDepth: audio.createGain(),
+      // Drum rotor (bass) - slower rotation
+      drumLFO_AM: audio.createOscillator(),
+      drumLFO_FM: audio.createOscillator(),
+      drumAMDepth: audio.createGain(),
+      drumFMDepth: audio.createGain(),
+      // Stereo panning LFOs
+      panLFO: audio.createOscillator(),
+      panDepth: audio.createGain(),
+      // Mix control
+      wetGain: audio.createGain(),
+      dryBypass: audio.createGain(),
+      // Speeds (Hz)
+      speeds: {
+        horn: { slow: 0.8, fast: 6.5 },
+        drum: { slow: 0.6, fast: 5.2 }
+      }
+    };
+
+    // Initialize Leslie LFOs
+    leslie.hornLFO_AM.frequency.value = leslie.speeds.horn.slow;
+    leslie.hornLFO_FM.frequency.value = leslie.speeds.horn.slow;
+    leslie.drumLFO_AM.frequency.value = leslie.speeds.drum.slow;
+    leslie.drumLFO_FM.frequency.value = leslie.speeds.drum.slow;
+    leslie.panLFO.frequency.value = 0.7;
+
+    // Set initial depths
+    leslie.hornAMDepth.gain.value = 0.3; // AM depth for horn
+    leslie.hornFMDepth.gain.value = 2.5; // FM depth (Hz deviation)
+    leslie.drumAMDepth.gain.value = 0.2; // AM depth for drum
+    leslie.drumFMDepth.gain.value = 1.5; // FM depth (Hz deviation)
+    leslie.panDepth.gain.value = 0.4; // Stereo panning depth
+
+    // Connect LFOs to depth controls
+    leslie.hornLFO_AM.connect(leslie.hornAMDepth);
+    leslie.hornLFO_FM.connect(leslie.hornFMDepth);
+    leslie.drumLFO_AM.connect(leslie.drumAMDepth);
+    leslie.drumLFO_FM.connect(leslie.drumFMDepth);
+    leslie.panLFO.connect(leslie.panDepth);
+
+    // Start all LFOs
+    leslie.hornLFO_AM.start();
+    leslie.hornLFO_FM.start();
+    leslie.drumLFO_AM.start();
+    leslie.drumLFO_FM.start();
+    leslie.panLFO.start();
+
+    // Create stereo processing for Leslie
+    // We'll use StereoPanner for the rotating effect and apply AM
+    leslie.splitter = audio.createChannelSplitter(2);
+    leslie.merger = audio.createChannelMerger(2);
+    leslie.leftAM = audio.createGain();
+    leslie.rightAM = audio.createGain();
+    leslie.panner = audio.createStereoPanner ? audio.createStereoPanner() : audio.createPanner();
+
+    // Connect Leslie signal path
+    leslie.splitter.connect(leslie.leftAM, 0);
+    leslie.splitter.connect(leslie.rightAM, 1);
+    leslie.leftAM.connect(leslie.merger, 0, 0);
+    leslie.rightAM.connect(leslie.merger, 0, 1);
+
+    if (leslie.panner.pan) {
+      leslie.merger.connect(leslie.panner);
+      leslie.panDepth.connect(leslie.panner.pan);
+    } else {
+      leslie.merger.connect(leslie.panner);
+    }
+
+    // AM modulation (tremolo effect from rotation)
+    leslie.hornAMDepth.connect(leslie.leftAM.gain);
+    leslie.drumAMDepth.connect(leslie.rightAM.gain);
+
+    // Leslie wet/dry mix
+    leslie.wetGain.gain.value = 0;
+    leslie.dryBypass.gain.value = 1;
+
+    leslie.panner.connect(leslie.wetGain);
+    leslie.wetGain.connect(dryGain);
+    leslie.dryBypass.connect(dryGain);
+
+    // Leslie input node (will be connected from voices)
+    leslie.input = audio.createGain();
+    leslie.input.connect(leslie.splitter);
+
+    // Function to change Leslie speed with smooth transition
+    function setLeslieSpeed(speed) {
+      const now = audio.currentTime;
+      leslie.targetSpeed = speed;
+      const ramp = 1.5; // 1.5 second transition (realistic acceleration/deceleration)
+
+      leslie.hornLFO_AM.frequency.setTargetAtTime(leslie.speeds.horn[speed], now, ramp / 3);
+      leslie.hornLFO_FM.frequency.setTargetAtTime(leslie.speeds.horn[speed], now, ramp / 3);
+      leslie.drumLFO_AM.frequency.setTargetAtTime(leslie.speeds.drum[speed], now, ramp / 3);
+      leslie.drumLFO_FM.frequency.setTargetAtTime(leslie.speeds.drum[speed], now, ramp / 3);
+
+      leslie.speed = speed;
+    }
+
+    // Function to toggle Leslie on/off
+    function toggleLeslie(enabled) {
+      const now = audio.currentTime;
+      leslie.enabled = enabled;
+
+      if (enabled) {
+        leslie.wetGain.gain.setTargetAtTime(0.8, now, 0.05);
+        leslie.dryBypass.gain.setTargetAtTime(0.2, now, 0.05);
+      } else {
+        leslie.wetGain.gain.setTargetAtTime(0, now, 0.05);
+        leslie.dryBypass.gain.setTargetAtTime(1, now, 0.05);
+      }
+    }
+
+    // ====== Drawbar Organ Synth ======
+    const harmonics = [1, 2, 3, 4, 5, 6, 8, 10, 12]; // Hammond-like set
+    let drawbars = [0.8, 0.5, 0.35, 0.2, 0.15, 0.1, 0.08, 0.06, 0.05];
+    const vibratoLFO = audio.createOscillator(); vibratoLFO.frequency.value = 5.5; const vibratoGain = audio.createGain(); vibratoGain.gain.value = 0.003; vibratoLFO.connect(vibratoGain); vibratoLFO.start();
+
+    const voices = new Map(); // note -> voice
+    let sustain = false; let pendingOff = new Set();
+
+    let A4 = 440, baseOct = 4;
+    function mtof(m) { return 440 * Math.pow(2, (m - 69) / 12) }
+
+    function startVoice(note) {
+      const t = audio.currentTime;
+      const freq = mtof(note);
+      const voiceGain = audio.createGain(); voiceGain.gain.setValueAtTime(0, t);
+      // envelope
+      const attack = parseFloat(dom.attack.value); const rel = parseFloat(dom.release.value);
+      voiceGain.gain.linearRampToValueAtTime(1, t + attack);
+
+      // Additive partials
+      const mix = audio.createGain();
+      const lfoOut = audio.createGain(); vibratoGain.connect(lfoOut.gain); lfoOut.gain.value = parseFloat(dom.vibrato.value) / 1000;
+
+      const partials = harmonics.map((h, i) => {
+        const osc = audio.createOscillator();
+        osc.type = 'sine'; osc.frequency.value = freq * h;
+        const g = audio.createGain(); g.gain.value = drawbars[i] || 0;
+        lfoOut.connect(osc.frequency);
+        osc.connect(g); g.connect(mix); osc.start();
+        return { osc, g };
+      });
+
+      const pre = audio.createGain(); pre.gain.value = parseFloat(dom.gain.value);
+      mix.connect(pre);
+
+      // Send to Leslie (if enabled) and bypass
+      pre.connect(leslie.input);
+      pre.connect(leslie.dryBypass);
+
+      // Send to reverb
+      pre.connect(convolver);
+
+      voiceGain.connect(pre);
+
+      const voice = {
+        note, partials, gain: voiceGain, pre, mix, stop: (now) => {
+          const t2 = now || audio.currentTime; const rel = parseFloat(dom.release.value);
+          voiceGain.gain.cancelScheduledValues(t2);
+          voiceGain.gain.setTargetAtTime(0.0001, t2, Math.max(0.01, rel / 3));
+          setTimeout(() => {
+            partials.forEach(p => { try { p.osc.stop(); p.osc.disconnect(); p.g.disconnect(); } catch { } });
+            try { voiceGain.disconnect(); pre.disconnect(); mix.disconnect(); } catch { }
+          }, (rel * 1000) + 80);
+        }
+      };
+
+      mix.connect(voiceGain);
+      voices.set(note, voice);
+      vuPing();
+    }
+
+    function stopVoice(note) {
+      const v = voices.get(note); if (!v) return;
+      v.stop(); voices.delete(note);
+    }
+
+    function allNotesOff() {
+      [...voices.keys()].forEach(n => stopVoice(n));
+    }
+
+    function vuPing() {
+      const el = document.getElementById('vu');
+      el.style.transition = 'none'; el.style.width = '90%';
+      requestAnimationFrame(() => { el.style.transition = 'width .35s ease'; el.style.width = '0%'; });
+    }
+
+    // ====== Keyboard mapping ======
+    const white = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', '\''];
+    const black = ['W', 'E', 'T', 'Y', 'U', 'O', 'P'];
+    const keyMap = {
+      // row ASDF... -> starting at C (middle range)
+      'A': 0, 'W': 1, 'S': 2, 'E': 3, 'D': 4, 'F': 5, 'T': 6, 'G': 7, 'Y': 8, 'H': 9, 'U': 10, 'J': 11, 'K': 12, 'O': 13, 'L': 14, 'P': 15, ';': 16, '\'': 17
+    };
+    let held = new Set();
+
+    function noteFromKey(code) {
+      const k = code.toUpperCase(); if (!(k in keyMap)) return null; const semi = keyMap[k];
+      return 12 * (baseOct + 1) + semi; // C offset
+    }
+
+    function handleDown(code) {
+      const n = noteFromKey(code); if (n == null) return;
+      if (held.has(n)) return; held.add(n);
+      startVoice(n);
+      recordEvent(0x90, n, 100);
+      activateKey(code, true);
+    }
+    function handleUp(code) {
+      const n = noteFromKey(code); if (n == null) return;
+      held.delete(n);
+      if (sustain) { pendingOff.add(n); }
+      else { stopVoice(n); }
+      recordEvent(0x80, n, 0);
+      activateKey(code, false);
+    }
+
+    function activateKey(code, on) {
+      const el = document.querySelector(`[data-key="${code.toUpperCase()}"]`);
+      if (el) { el.classList.toggle('active', !!on); }
+    }
+
+    // Sustain logic on keyup of Space
+    function flushSustain() {
+      pendingOff.forEach(n => stopVoice(n)); pendingOff.clear();
+    }
+
+    // ====== DOM & UI ======
+    const dom = {
+      bars: document.getElementById('bars'), kbd: document.getElementById('kbd'),
+      attack: document.getElementById('attack'), release: document.getElementById('release'), vibrato: document.getElementById('vibrato'), gain: document.getElementById('gain'), reverbMix: document.getElementById('reverbMix'),
+      leslieToggle: document.getElementById('leslieToggle'), leslieSpeed: document.getElementById('leslieSpeed'), leslieDepth: document.getElementById('leslieDepth'),
+      oct: document.getElementById('oct'), octUp: document.getElementById('octUp'), octDown: document.getElementById('octDown'),
+      sustainBtn: document.getElementById('sustainBtn'), panic: document.getElementById('panic'),
+      rec: document.getElementById('rec'), play: document.getElementById('play'), stop: document.getElementById('stop'), clear: document.getElementById('clear'), exportBtn: document.getElementById('export'), recStatus: document.getElementById('recStatus'),
+      tempo: document.getElementById('tempo'), bpm: document.getElementById('bpm'), midiLed: document.getElementById('midiLed')
+    };
+
+    // Build drawbars
+    function addBar(i) {
+      const wrap = document.createElement('div'); wrap.className = 'drawbar';
+      const r = document.createElement('input'); r.type = 'range'; r.min = 0; r.max = 1; r.step = 0.01; r.value = drawbars[i]; r.addEventListener('input', () => { drawbars[i] = parseFloat(r.value) });
+      const n = document.createElement('span'); n.className = 'num'; n.textContent = `H${harmonics[i]}`;
+      wrap.appendChild(r); wrap.appendChild(n); dom.bars.appendChild(wrap);
+    }
+    for (let i = 0; i < harmonics.length; i++) addBar(i);
+
+    // Build keyboard UI (one octave + extension)
+    const layout = [
+      { k: 'A', lbl: 'C' }, { k: 'W', lbl: 'C#', black: true }, { k: 'S', lbl: 'D' }, { k: 'E', lbl: 'D#', black: true }, { k: 'D', lbl: 'E' },
+      { k: 'F', lbl: 'F' }, { k: 'T', lbl: 'F#', black: true }, { k: 'G', lbl: 'G' }, { k: 'Y', lbl: 'G#', black: true }, { k: 'H', lbl: 'A' }, { k: 'U', lbl: 'A#', black: true }, { k: 'J', lbl: 'B' },
+      { k: 'K', lbl: 'C' }, { k: 'O', lbl: 'C#', black: true }, { k: 'L', lbl: 'D' }, { k: 'P', lbl: 'D#', black: true }, { k: ';', lbl: 'E' }, { k: "'", lbl: 'F' }
+    ];
+    layout.forEach(item => {
+      const d = document.createElement('div'); d.className = 'key' + (item.black ? ' black' : ''); d.dataset.key = item.k; d.innerHTML = `<span>${item.k}\n${item.lbl}</span>`; dom.kbd.appendChild(d);
+    });
+
+    // Controls
+    dom.octUp.onclick = () => { baseOct = Math.min(baseOct + 1, 7); dom.oct.textContent = `Oct ${baseOct}`; };
+    dom.octDown.onclick = () => { baseOct = Math.max(baseOct - 1, 1); dom.oct.textContent = `Oct ${baseOct}`; };
+    dom.sustainBtn.onclick = () => { sustain = !sustain; dom.sustainBtn.classList.toggle('ok', sustain); if (!sustain) flushSustain(); };
+    dom.panic.onclick = () => { pendingOff.clear(); allNotesOff(); };
+    dom.reverbMix.oninput = () => { reverbGain.gain.value = parseFloat(dom.reverbMix.value) };
+    dom.vibrato.oninput = () => { /* handled per voice via lfoOut.gain */ };
+    dom.tempo.oninput = () => { dom.bpm.textContent = `${dom.tempo.value} BPM`; };
+
+    // Leslie controls
+    dom.leslieToggle.onclick = () => {
+      leslie.enabled = !leslie.enabled;
+      toggleLeslie(leslie.enabled);
+      if (leslie.enabled) {
+        dom.leslieToggle.textContent = '🌀 Leslie On';
+        dom.leslieToggle.classList.remove('warn');
+        dom.leslieToggle.classList.add('ok');
+        dom.leslieSpeed.disabled = false;
+        dom.leslieDepth.disabled = false;
+      } else {
+        dom.leslieToggle.textContent = '🌀 Leslie Off';
+        dom.leslieToggle.classList.remove('ok');
+        dom.leslieToggle.classList.add('warn');
+        dom.leslieSpeed.disabled = true;
+        dom.leslieDepth.disabled = true;
+      }
+    };
+
+    dom.leslieSpeed.onclick = () => {
+      if (!leslie.enabled) return;
+      const newSpeed = leslie.speed === 'slow' ? 'fast' : 'slow';
+      setLeslieSpeed(newSpeed);
+      dom.leslieSpeed.textContent = newSpeed === 'fast' ? '⚡ Fast' : '🐢 Slow';
+    };
+
+    dom.leslieDepth.oninput = () => {
+      const depth = parseFloat(dom.leslieDepth.value);
+      leslie.hornAMDepth.gain.value = 0.3 * depth;
+      leslie.drumAMDepth.gain.value = 0.2 * depth;
+      leslie.panDepth.gain.value = 0.4 * depth;
+    };
+
+    // Keyboard listeners
+    const down = new Set();
+    window.addEventListener('keydown', (e) => {
+      if (e.repeat) return; if (!audioWasUnlocked) { unlockAudio(); }
+      // modifiers
+      if (e.code === 'Space') { e.preventDefault(); sustain = true; dom.sustainBtn.classList.add('ok'); return; }
+      if (e.key === 'Shift') { baseOct = Math.min(baseOct + 1, 7); dom.oct.textContent = `Oct ${baseOct}`; return; }
+      if (e.key === 'Control') { baseOct = Math.max(baseOct - 1, 1); dom.oct.textContent = `Oct ${baseOct}`; return; }
+      const k = e.key.length === 1 ? e.key : e.code.replace('Key', '');
+      handleDown(k);
+    });
+    window.addEventListener('keyup', (e) => {
+      if (e.code === 'Space') { sustain = false; dom.sustainBtn.classList.remove('ok'); flushSustain(); return; }
+      if (e.key === 'Shift' || e.key === 'Control') return;
+      const k = e.key.length === 1 ? e.key : e.code.replace('Key', '');
+      handleUp(k);
+    });
+
+    // Mouse on keys (optional)
+    dom.kbd.addEventListener('mousedown', (e) => {
+      const target = e.target.closest('.key'); if (!target) return; const k = target.dataset.key; handleDown(k);
+    });
+    dom.kbd.addEventListener('mouseup', (e) => {
+      const target = e.target.closest('.key'); if (!target) return; const k = target.dataset.key; handleUp(k);
+    });
+
+    // ====== WebMIDI ======
+    let midiAccess = null; let audioWasUnlocked = false; let startTime = audio.currentTime;
+    function unlockAudio() { if (audio.state === 'suspended') { audio.resume(); } audioWasUnlocked = true; }
+    function setMidiLed(on) { dom.midiLed.classList.toggle('on', !!on); }
+
+    if (navigator.requestMIDIAccess) {
+      navigator.requestMIDIAccess().then((ma) => {
+        midiAccess = ma; setMidiLed(true);
+        function listen(input) {
+          input.onmidimessage = (msg) => {
+            const [st, d1, d2] = msg.data; const cmd = st & 0xf0, ch = st & 0x0f;
+            if (cmd === 0x90 && d2 > 0) { if (!audioWasUnlocked) unlockAudio(); startVoice(d1); recordEvent(0x90, d1, d2); }
+            else if ((cmd === 0x90 && d2 === 0) || cmd === 0x80) { if (sustain) { pendingOff.add(d1); } else { stopVoice(d1); } recordEvent(0x80, d1, 0); }
+            else if (cmd === 0xB0 && d1 === 64) { // sustain pedal
+              sustain = d2 >= 64; dom.sustainBtn.classList.toggle('ok', sustain); if (!sustain) flushSustain();
+            }
+          };
+        }
+        for (const input of ma.inputs.values()) { listen(input); }
+        ma.onstatechange = (e) => { setMidiLed(ma.inputs.size > 0); };
+      }).catch(() => setMidiLed(false));
+    }
+
+    // ====== Simple MIDI Recorder / Player / Export ======
+    const recState = { recording: false, events: [], t0: 0, playing: false, playTimer: null };
+    function nowMS() { return performance.now(); }
+    function recordEvent(status, d1, d2) {
+      if (!recState.recording) return;
+      const t = nowMS() - recState.t0; recState.events.push({ t, status, d1, d2 });
+      dom.recStatus.textContent = `הוקלטו ${recState.events.length} אירועים`;
+    }
+
+    dom.rec.onclick = () => {
+      recState.recording = !recState.recording;
+      if (recState.recording) { recState.events = []; recState.t0 = nowMS(); dom.rec.textContent = '⏹️ עצור הקלטה'; dom.play.disabled = true; dom.clear.disabled = true; dom.exportBtn.disabled = true; dom.recStatus.textContent = 'מק录…'; }
+      else { dom.rec.textContent = '⏺️ הקלט'; dom.play.disabled = recState.events.length === 0; dom.clear.disabled = recState.events.length === 0; dom.exportBtn.disabled = recState.events.length === 0; dom.recStatus.textContent = `הקלטה הסתיימה • ${recState.events.length} אירועים`; }
+    };
+    dom.clear.onclick = () => { recState.events = []; dom.play.disabled = true; dom.clear.disabled = true; dom.exportBtn.disabled = true; dom.recStatus.textContent = 'נוקה.' };
+
+    dom.play.onclick = () => {
+      if (recState.playing) return; if (recState.events.length === 0) return;
+      recState.playing = true; dom.stop.disabled = false; dom.play.disabled = true; const tempo = parseInt(dom.tempo.value, 10); const msPerQN = 60000 / tempo; const ppq = 480;
+      // Schedule using relative time
+      const t0 = audio.currentTime; const startMs = nowMS();
+      recState.events.forEach(ev => {
+        const dt = ev.t; setTimeout(() => {
+          if (!recState.playing) return;
+          if ((ev.status & 0xf0) === 0x90 && ev.d2 > 0) startVoice(ev.d1);
+          else if (((ev.status & 0xf0) === 0x90 && ev.d2 === 0) || (ev.status & 0xf0) === 0x80) { if (sustain) { pendingOff.add(ev.d1); } else { stopVoice(ev.d1); } }
+        }, dt);
+      });
+    };
+    dom.stop.onclick = () => { recState.playing = false; dom.stop.disabled = true; dom.play.disabled = false; };
+
+    dom.exportBtn.onclick = () => {
+      const tempo = parseInt(dom.tempo.value, 10);
+      const bytes = buildMIDI(recState.events, tempo);
+      const blob = new Blob([new Uint8Array(bytes)], { type: 'audio/midi' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `web-organ-${Date.now()}.mid`; a.click();
+    };
+
+    function buildMIDI(events, tempoBPM) {
+      // Minimal SMF Type 0
+      const ppq = 480; const tempo = Math.round(60000000 / tempoBPM); // microsec/qn
+      // sort by time
+      const evs = [...events].sort((a, b) => a.t - b.t);
+      // Convert ms to ticks (assume 1 qn = 60000/tempoBPM ms)
+      const msPerTick = (60000 / tempoBPM) / ppq;
+      // Build track
+      const track = [];
+      function pushVarLen(v) { let buffer = v & 0x7F; const out = []; while ((v >>= 7)) { buffer <<= 8; buffer |= ((v & 0x7F) | 0x80); } while (true) { out.push(buffer & 0xFF); if (buffer & 0x80) buffer >>= 8; else break; } return out; }
+      function pushBytes(arr) { for (const b of arr) track.push(b); }
+      // tempo meta at start
+      pushBytes([0x00, 0xFF, 0x51, 0x03, (tempo >> 16) & 255, (tempo >> 8) & 255, tempo & 255]);
+      let lastTick = 0;
+      for (const e of evs) {
+        const tick = Math.round(e.t / msPerTick);
+        const delta = tick - lastTick; lastTick = tick;
+        pushBytes(pushVarLen(delta));
+        pushBytes([e.status, e.d1, e.d2]);
+      }
+      // end of track
+      pushBytes([0x00, 0xFF, 0x2F, 0x00]);
+
+      function chunk(type, data) {
+        return [...type, (data.length >> 24) & 255, (data.length >> 16) & 255, (data.length >> 8) & 255, data.length & 255, ...data];
+      }
+      const header = chunk([0x4D, 0x54, 0x68, 0x64], [0x00, 0x00, 0x00, 0x00,  // format 0
+        0x00, 0x01,          // one track
+        (ppq >> 8) & 255, ppq & 255]);
+      const trk = chunk([0x4D, 0x54, 0x72, 0x6B], track);
+      return [...header, ...trk];
+    }
+
+    // Enable Export button when recording exists
+    const ro = new MutationObserver(() => {
+      const has = recState.events.length > 0; dom.exportBtn.disabled = !has; dom.play.disabled = !has; dom.clear.disabled = !has;
+    }); ro.observe(dom.recStatus, { subtree: true, childList: true, characterData: true });
+
+    // Hot drawbar presets 1–9
+    const presets = {
+      '1': [0.8, 0.8, 0.8, 0, 0, 0, 0, 0, 0], // 888000000
+      '2': [0.8, 0, 0.8, 0.6, 0, 0, 0.2, 0, 0],
+      '3': [0.8, 0.7, 0.4, 0.2, 0.2, 0.1, 0, 0, 0],
+      '4': [0.9, 0.5, 0.2, 0, 0, 0, 0.3, 0.2, 0.1],
+      '5': [0.6, 0.6, 0.6, 0.6, 0.3, 0.2, 0.1, 0.1, 0.1],
+      '6': [0.9, 0.9, 0.2, 0.2, 0.1, 0.1, 0.1, 0, 0],
+      '7': [0.8, 0.5, 0.0, 0.6, 0.0, 0.3, 0.0, 0.2, 0.0],
+      '8': [0.5, 0.0, 0.8, 0.0, 0.5, 0.0, 0.3, 0.0, 0.2],
+      '9': [0.9, 0.3, 0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+    };
+    window.addEventListener('keydown', (e) => {
+      if (e.key >= '1' && e.key <= '9') {
+        const p = presets[e.key]; if (!p) return; drawbars = [...p];
+        // update UI sliders
+        [...dom.bars.querySelectorAll('input[type=range]')].forEach((r, i) => r.value = drawbars[i]);
+      }
+    });
+
+    // Initial user gesture unlock notice
+    document.body.addEventListener('pointerdown', unlockAudio, { once: true });
+  </script>
+</body>
+
+</html>
